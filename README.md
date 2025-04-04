@@ -27,9 +27,5 @@ Game of 15 is a classic puzzle game that is isomorphic to Tic Tac Toe. In this p
 4. **Objective:**  
    Fill the board by taking turns placing digits. The first to complete a row, column, or diagonal that sums to 15 wins. If the board fills up without any winning line, the game is a tie.
 
-## Installation
 
-1. **Clone the Repository:**
 
-   ```bash
-   (http://127.0.0.1:5500/src/)
