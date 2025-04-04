@@ -32,4 +32,4 @@ Game of 15 is a classic puzzle game that is isomorphic to Tic Tac Toe. In this p
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/your-username/game-of-15.git
+   (http://127.0.0.1:5500/src/)
