@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game of 15: AI vs. Human (Odd/Even)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Game of 15</h1>
+    <p>AI vs. Human</p>
+  </header>
+
+  <section class="instructions">
+    <p>The goal is to form a row, column, or diagonal that sums to 15.</p>
+    <p>You can pick <strong>Odd</strong> or <strong>Even</strong> digits. The AI will play the other side.<br>
+       For a real minimax AI, replace the random logic with your own game code.</p>
+  </section>
+
+  <div class="game-area">
+    <!-- Parity Selection -->
+    <div id="parity-selection">
+      <label>
+        <input type="radio" name="parity" value="odd" checked>
+        I want to play ODD (1,3,5,7,9)
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="parity" value="even">
+        I want to play EVEN (2,4,6,8)
+      </label>
+    </div>
+
+    <!-- Game Board -->
+    <div id="game-board">
+      <table>
+        <tr>
+          <td class="cell" data-index="0"></td>
+          <td class="cell" data-index="1"></td>
+          <td class="cell" data-index="2"></td>
+        </tr>
+        <tr>
+          <td class="cell" data-index="3"></td>
+          <td class="cell" data-index="4"></td>
+          <td class="cell" data-index="5"></td>
+        </tr>
+        <tr>
+          <td class="cell" data-index="6"></td>
+          <td class="cell" data-index="7"></td>
+          <td class="cell" data-index="8"></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="start-game">Start Game</button>
+      <div id="status">Select Odd or Even, then click "Start Game".</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // We'll store the board as an array of length 9 (0 = empty)
+  let board = [0,0,0,0,0,0,0,0,0];
+  // Track which digits are used (index 1..9)
+  let usedDigits = new Array(10).fill(false);
+
+  // Keep track of who is Odd or Even
+  let humanIsOdd = true;   // default
+  let aiIsOdd = false;     // opposite
+
+  let gameActive = false;
+
+  const cells = document.querySelectorAll('.cell');
+  const statusEl = document.getElementById('status');
+  const startBtn = document.getElementById('start-game');
+  const parityRadios = document.getElementsByName('parity');
+
+  // Reset the board and used digits
+  function resetGame() {
+    board = [0,0,0,0,0,0,0,0,0];
+    usedDigits.fill(false);
+    cells.forEach(cell => cell.textContent = '');
+    gameActive = true;
+  }
+
+  // Decide who is odd/even based on user selection
+  function readParitySelection() {
+    for (let radio of parityRadios) {
+      if (radio.checked) {
+        if (radio.value === 'odd') {
+          humanIsOdd = true;
+          aiIsOdd = false;
+        } else {
+          humanIsOdd = false;
+          aiIsOdd = true;
+        }
+        break;
+      }
+    }
+  }
+
+  // Start Game button
+  startBtn.addEventListener('click', () => {
+    readParitySelection();
+    resetGame();
+    if (humanIsOdd) {
+      statusEl.textContent = "Game started! You are ODD digits. Your move!";
+    } else {
+      statusEl.textContent = "Game started! You are EVEN digits. Your move!";
+    }
+  });
+
+  // Handle user clicks on the board
+  cells.forEach(cell => {
+    cell.addEventListener('click', function() {
+      if (!gameActive) return; // game not active
+      const idx = parseInt(cell.getAttribute('data-index'));
+      if (board[idx] !== 0) {
+        alert("Cell is already occupied!");
+        return;
+      }
+      // Determine required parity for the human's move
+      // We track how many moves so far by counting nonzero in 'board'
+      const moveCount = board.filter(v => v !== 0).length;
+      const isOddTurn = ((moveCount + 1) % 2 !== 0); // 1st, 3rd, 5th, etc.
+
+      // If human is odd, they can only place odd digits on odd turns, etc.
+      // But let's do a simpler approach: we directly check user input.
+
+      let input = prompt(`Enter a digit (${humanIsOdd ? "Odd" : "Even"} only):`);
+      if (!input) return;
+      input = input.trim();
+      if (isNaN(input)) {
+        alert("Please enter a valid number.");
+        return;
+      }
+      let num = parseInt(input);
+      if (num < 1 || num > 9) {
+        alert("Digit must be between 1 and 9.");
+        return;
+      }
+      // Check parity
+      if (humanIsOdd && (num % 2 === 0)) {
+        alert("You are ODD. Please choose an odd digit (1,3,5,7,9).");
+        return;
+      }
+      if (!humanIsOdd && (num % 2 !== 0)) {
+        alert("You are EVEN. Please choose an even digit (2,4,6,8).");
+        return;
+      }
+      // Check if used
+      if (usedDigits[num]) {
+        alert("That digit is already used! Try another.");
+        return;
+      }
+
+      // Place the digit
+      board[idx] = num;
+      usedDigits[num] = true;
+      cell.textContent = num;
+
+      // Check for user win or tie
+      if (checkWin()) {
+        statusEl.textContent = "You win! Congratulations!";
+        gameActive = false;
+        return;
+      }
+      if (boardFull()) {
+        statusEl.textContent = "It's a tie!";
+        gameActive = false;
+        return;
+      }
+
+      // AI move
+      statusEl.textContent = `You placed ${num}. AI is thinking...`;
+      setTimeout(() => {
+        aiMove();
+      }, 600); // small delay
+    });
+  });
+
+  // AI picks a random available digit of the correct parity
+  function aiMove() {
+    // If game ended during the delay, do nothing
+    if (!gameActive) return;
+
+    // Find empty cells
+    let emptyIndices = [];
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === 0) {
+        emptyIndices.push(i);
+      }
+    }
+    if (emptyIndices.length === 0) {
+      statusEl.textContent = "It's a tie!";
+      gameActive = false;
+      return;
+    }
+
+    // Collect available digits of AI's parity
+    let possibleDigits = [];
+    for (let d = 1; d <= 9; d++) {
+      if (!usedDigits[d]) {
+        if (aiIsOdd && d % 2 !== 0) {
+          possibleDigits.push(d);
+        }
+        if (!aiIsOdd && d % 2 === 0) {
+          possibleDigits.push(d);
+        }
+      }
+    }
+    if (possibleDigits.length === 0) {
+      // No digits left for AI => tie
+      statusEl.textContent = "It's a tie!";
+      gameActive = false;
+      return;
+    }
+
+    // Randomly pick one cell & digit (replace with minimax logic if desired)
+    const randomCell = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+    const randomDigit = possibleDigits[Math.floor(Math.random() * possibleDigits.length)];
+
+    board[randomCell] = randomDigit;
+    usedDigits[randomDigit] = true;
+    const aiCell = document.querySelector(`.cell[data-index="${randomCell}"]`);
+    aiCell.textContent = randomDigit;
+
+    // Check if AI wins
+    if (checkWin()) {
+      statusEl.textContent = "AI wins! Better luck next time.";
+      gameActive = false;
+      return;
+    }
+    if (boardFull()) {
+      statusEl.textContent = "It's a tie!";
+      gameActive = false;
+      return;
+    }
+
+    statusEl.textContent = `AI placed ${randomDigit}. Your move!`;
+  }
+
+  // Check for a winning line (sum=15)
+  function checkWin() {
+    // 3 rows
+    if (lineSum(0,1,2) === 15) return true;
+    if (lineSum(3,4,5) === 15) return true;
+    if (lineSum(6,7,8) === 15) return true;
+    // 3 cols
+    if (lineSum(0,3,6) === 15) return true;
+    if (lineSum(1,4,7) === 15) return true;
+    if (lineSum(2,5,8) === 15) return true;
+    // 2 diagonals
+    if (lineSum(0,4,8) === 15) return true;
+    if (lineSum(2,4,6) === 15) return true;
+    return false;
+  }
+  function lineSum(i1,i2,i3) {
+    return board[i1] + board[i2] + board[i3];
+  }
+
+  // Check if board is full (no zero entries)
+  function boardFull() {
+    return board.every(v => v !== 0);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  background: linear-gradient(120deg, #f0f8ff, #f8f0ff);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  width: 90%;
+  max-width: 700px;
+  margin: 50px auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  color: #333;
+  font-size: 2.5em;
+  margin: 0;
+}
+
+header p {
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Instructions */
+.instructions {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  text-align: center;
+  font-size: 1.1em;
+  line-height: 1.5em;
+  margin-bottom: 20px;
+}
+
+/* Order & Parity Selection */
+#order-selection, #parity-selection {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#order-selection h3, #parity-selection h3 {
+  margin-bottom: 10px;
+  color: #444;
+}
+
+label {
+  font-size: 1em;
+  margin: 5px;
+}
+
+.odd-label {
+  color: #d9534f;
+}
+
+.even-label {
+  color: #5bc0de;
+}
+
+/* Game Board */
+#game-board {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  border: 2px solid #444;
+  text-align: center;
+  font-size: 2em;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  user-select: none;
+  border-radius: 8px;
+}
+
+.cell:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+/* Digit Colors */
+.odd-digit {
+  color: #d9534f;
+}
+
+.even-digit {
+  color: #5bc0de;
+}
+
+/* Controls */
+.controls {
+  text-align: center;
+}
+
+#start-game {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#start-game:hover {
+  background-color: #45a049;
+}
+
+#status {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  background: linear-gradient(120deg, #f0f8ff, #f8f0ff);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  width: 90%;
+  max-width: 700px;
+  margin: 50px auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0
